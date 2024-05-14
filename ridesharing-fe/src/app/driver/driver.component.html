@@ -1,0 +1,30 @@
+<div class="container-fluid">
+    <div>
+        <h3 style="text-align: center">Await Ride Request</h3>
+    </div>
+    <div id="map"></div>
+    <div id="instructions" style="text-align: center">
+        <div><h4>Driver Instruction</h4></div>
+       Await ride request from riders
+    </div>
+    <hr/>
+    <div *ngIf="rideRequestIsSet">
+        <div style="text-align: center; color: orangered; font-size: 16px"><h5>{{ h5TextLabel }}</h5></div>
+        <table class="table table-striped">
+            <thead>
+            <tr><th>Rider Name</th><th>Source</th><th>Destination</th><th>Price</th></tr>
+            </thead>
+            <tbody>
+            <tr><td>{{ rideRequest.riderName }}</td><td>{{ rideRequest.source }}</td><td>{{ rideRequest.destination }}</td><td>{{ rideRequest.fair }}</td></tr>
+            <tr *ngIf="!rideRequestAccepted"><td colspan="3" >
+                <button class="btn btn-primary btn-sm" (click)="onRequestApproval(true)">Accept</button> &nbsp; &nbsp;
+                <button class="btn btn-danger btn-sm" (click)="onRequestApproval(false)">Reject</button></td>
+            </tr>
+            <tr *ngIf="rideRequestAccepted"><td colspan="3" >
+              <button class="btn btn-success btn-sm" (click)="onRequestApproval(true)">Start Ride</button> &nbsp; &nbsp;
+              <button class="btn btn-danger btn-sm" (click)="onRequestApproval(false)">Cancel Ride</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

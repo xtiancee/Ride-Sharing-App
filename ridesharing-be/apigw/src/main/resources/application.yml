@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+#      globalcors:
+#        corsConfigurations:
+#          '[/**]':
+#            allowedOrigins: "http://localhost:4200"
+#            allowedHeaders: "*"
+#            allowedMethods:
+#              - GET
+#              - POST
+#              - PUT
+#              - DELETE
+#              - OPTIONS
+#              - PATCH
+#            allowCredentials: true
+
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/v1/auth/**
+          metadata:
+              cors:
+                allowedOrigins: '*'
+                allowedMethods:
+                  - GET
+                  - POST
+                allowedHeaders: '*'
+                maxAge: 30
+
+        - id: ride-service
+          uri: lb://RIDE-SERVICE
+          predicates:
+            - Path=/api/v1/ride/**
+          filters:
+            - AuthenticationFilter
+
+        - id: location-service
+          uri: lb://LOCATION-SERVICE
+          predicates:
+            - Path=/api/v1/location/**
+          filters:
+            - AuthenticationFilter
+
+        - id: ride-matching-service
+          uri: lb://RIDE-MATCHING-SERVICE
+          predicates:
+            - Path=/api/v1/ride-matching/**
+          filters:
+            - AuthenticationFilter
+
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+              - Path=/ws/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    registry-fetch-interval-seconds: 10
+

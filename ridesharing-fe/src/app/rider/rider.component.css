@@ -1,0 +1,14 @@
+#map {
+    height: 50vh;
+    width: 90vh;
+    margin: auto;
+}
+
+.approved {
+    color: orangered!important;
+}
+
+.pending {
+    color: darkgreen!important;
+}
+

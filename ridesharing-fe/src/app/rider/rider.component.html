@@ -1,0 +1,46 @@
+<div class="container-fluid">
+   <div>
+    <h3 style="text-align: center">Book A Ride Now</h3>
+   </div>
+    <div id="map"></div>
+    <div id="instructions" style="text-align: center" *ngIf="!rideInProgress">
+        <div><h4>Instruction</h4></div>
+        Pick click on any close preferred location from your current location on the map to proceed.
+    </div>
+    <hr/>
+
+    <div *ngIf="rideLocIsSet">
+        <div style="text-align: center"><h5>Your Ride Information</h5></div>
+        <table class="table table-striped">
+            <thead>
+             <tr><th>Your Location</th><th>Destination</th><th>Price</th></tr>
+            </thead>
+            <tbody>
+            <tr><td>{{ currentLoc }}</td><td>{{ destLoc }}</td><th>$150</th></tr>
+            <tr><td colspan="3" >
+                <button class="btn btn-primary btn-sm" (click)="onProceed()">Proceed</button> &nbsp; &nbsp;
+                <button class="btn btn-danger btn-sm" (click)="onCancelRideRequest()">Cancel</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="rideInProgress" style="text-align: center;">
+
+        <h6 style=" color: orangered; font-size: 16px; margin-bottom: 5px" class="{{ driverApproved ? 'approved' : 'pending' }}">{{ textLabel }}</h6>
+
+        <div>
+            <table class="table table-striped">
+                <thead>
+                <tr><th>Your Location</th><th>Destination</th><th>Price</th><th>Driver Name</th><th>Driver Location</th></tr>
+                </thead>
+                <tbody>
+                <tr><td>{{ currentLoc }}</td><td>{{ destLoc }}</td><th>$150</th><td>{{ driverName }}</td><td>{{ driverLoc }}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div >
+
+    </div>
+</div>
