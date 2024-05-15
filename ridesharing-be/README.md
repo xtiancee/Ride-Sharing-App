@@ -24,3 +24,14 @@ Architecture: Microservice
 6. java -jar notification-service/target/notification-service-1.0-SNAPSHOT.jar
 7. java -jar location-service/target/location-service-1.0-SNAPSHOT.jar
 8. java -jar apigw/target/apigw-1.0-SNAPSHOT.jar
+
+Notes: 
+1. The steps should be followed as listed
+2. After a successful startup. sign in through front end with details below
+
+email: `admin@email.com`
+password: `123456`
+
+3. Use the "Signup" tab at the front end to signup "Riders only", when logged in as Admin user. You will find option to onboard drivers at the driver tab
+
+Thats all.

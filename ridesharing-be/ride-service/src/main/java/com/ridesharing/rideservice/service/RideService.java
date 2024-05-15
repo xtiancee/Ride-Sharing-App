@@ -249,7 +249,7 @@ public class RideService {
 
         Message<RideMatchRequest> msg = MessageBuilder
                 .withPayload(newMatchRequest)
-                .setHeader(KafkaHeaders.TOPIC, Constants.RIDE_TOPIC)
+                .setHeader(KafkaHeaders.TOPIC, Constants.RIDE_MATCH_TOPIC)
                 .build();
 
         kafkaTemplate.send(msg);

@@ -27,10 +27,15 @@ public class RideMatchingService {
 
     private final DriverLocationClient locationRestClient;
     private final KafkaTemplate<String, DriverRequest> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplateDriverNotFound;
     private final RideClient rideRestClient;
     private final DriverRequestLockService distributedLockService;
 
-    @KafkaListener(topics = Constants.RIDE_TOPIC, groupId = Constants.RIDE_TOPIC_GROUP)
+    @KafkaListener(
+            topics = Constants.RIDE_MATCH_TOPIC,
+            groupId = Constants.RIDE_MATCH_TOPIC_GROUP,
+            containerFactory = "rideMatchRequestListenerContainerFactory"
+    )
     public void matchRider(RideMatchRequest request) {
 
         log.info("matching process began");
@@ -95,8 +100,17 @@ public class RideMatchingService {
             }
 
             if(secCount > 3) {
-                log.info("I can not find drivers.. stopping");
                 noMatch = false;
+
+                log.info("I can not find drivers.. stopping");
+
+                Message<String> msg = MessageBuilder
+                        .withPayload(request.getRide().getRiderId())
+                        .setHeader(KafkaHeaders.TOPIC, Constants.DRIVER_NOT_FOUND_TOPIC)
+
+                        .build();
+
+                kafkaTemplateDriverNotFound.send(msg);
             }
         }
     }

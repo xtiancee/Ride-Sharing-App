@@ -29,6 +29,8 @@ export class RiderComponent implements OnInit, OnDestroy {
   driverLocInterval: any;
   riderMarker: any;
   driverMarker: any;
+  ridePayload: any
+  driverNotFound = false;
 
   constructor(private webSocketService: WebsocketService,
               private authService: AuthService) {
@@ -45,10 +47,8 @@ export class RiderComponent implements OnInit, OnDestroy {
         take(1) // Take only one value (true when connected)
     ).subscribe((connected: boolean) => {
       if (connected) {
-        console.log("stomp client is connected");
         this.webSocketService.riderSubscribe()
             .subscribe((message) => {
-              console.log("Message from websocket received: ", message)
               message = JSON.parse(message)
               if(message.type === "DRIVER_APPROVED"){
                 this.driverName = message.message.driverName;
@@ -74,6 +74,10 @@ export class RiderComponent implements OnInit, OnDestroy {
               if(message === "DRIVER_LOCATION"){
                 this.driverMarker.setLatLng([message.lng, message.lat]);
               }
+              if(message.type === "DRIVER_NOT_FOUND"){
+                this.driverNotFound = true;
+              }
+
             });
       } else {
         console.log("on init stomp client is connected");
@@ -148,6 +152,8 @@ export class RiderComponent implements OnInit, OnDestroy {
             lng: coords.longitude
           }
 
+          console.log("Location DATA: ", userLoc)
+
           this.webSocketService.sendLocation(userLoc);
 
         },(error) => {
@@ -179,8 +185,9 @@ export class RiderComponent implements OnInit, OnDestroy {
         destination: this.destLoc.toString()
       }
 
-      console.log("Ride request sent ", rideRequest);
-      this.webSocketService.onNewRide(rideRequest);
+      this.ridePayload = rideRequest;
+      this.sendForRide();
+
 
     },(error) => {
       console.log("Error ", error);
@@ -192,6 +199,13 @@ export class RiderComponent implements OnInit, OnDestroy {
 
     this.rideInProgress = true;
   }
+
+  sendForRide() {
+    this.driverNotFound = false;
+    this.textLabel = 'Please wait while we find you a close driver for your trip ...';
+    this.webSocketService.onNewRide(this.ridePayload);
+  }
+
   ngOnDestroy() {
     this.sub.unsubscribe();
     this.webSocketService.disconnect();
@@ -206,6 +220,7 @@ export class RiderComponent implements OnInit, OnDestroy {
 
   onCancelRideRequest(){
     this.rideLocIsSet = false;
+    this.rideInProgress = false;
   }
 
   getDriverLocation(){
@@ -217,7 +232,6 @@ export class RiderComponent implements OnInit, OnDestroy {
         userToLocate: this.driverId
       }
 
-      console.log("Driver To Locate ", dto)
       this.webSocketService.getDriverLocation(dto);
     },5000)
   }

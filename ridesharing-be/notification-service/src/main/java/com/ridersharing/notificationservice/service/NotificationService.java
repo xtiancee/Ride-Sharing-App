@@ -76,4 +76,19 @@ public class NotificationService {
 
         messageTemplate.convertAndSendToUser(msg.getClientId(), msg.getDestination(), message);
     }
+
+    @KafkaListener(
+            topics = Constants.DRIVER_NOT_FOUND_TOPIC,
+            groupId = Constants.DRIVER_NOT_FOUND_TOPIC_GROUP,
+            containerFactory = "driverNotFoundListenerContainerFactory")
+    public void listenDriverNotFound(String msg){
+
+        // notify rider for ride approved
+        NotificationMsg message = NotificationMsg.builder()
+                .type(NotificationType.DRIVER_NOT_FOUND)
+                .message("No driver was found for you at the moment")
+                .build();
+
+        messageTemplate.convertAndSendToUser(msg, "/rider", message);
+    }
 }

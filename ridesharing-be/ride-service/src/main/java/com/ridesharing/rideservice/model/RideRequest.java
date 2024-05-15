@@ -13,7 +13,8 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-@RedisHash(value="ride_requests", timeToLive = 60L)
+//@RedisHash(value="ride_requests", timeToLive = 60L)
+@RedisHash(value="ride_requests")
 @Builder
 public class RideRequest implements Serializable {
 

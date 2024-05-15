@@ -48,6 +48,8 @@ public class LocationController {
 
     @PostMapping("/drivers")
     public ResponseEntity<List<UserLocation>> getDriversWithinLocation(@RequestBody Point location) {
+        var closeDrivers = locationService.getDriversForRider(location);
+        log.info("returned close drivers {} ", closeDrivers);
         return ResponseEntity.ok(locationService.getDriversForRider(location));
     }
 

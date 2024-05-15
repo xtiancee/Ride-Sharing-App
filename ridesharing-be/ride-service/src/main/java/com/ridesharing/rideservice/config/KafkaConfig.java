@@ -1,9 +1,6 @@
 package com.ridesharing.rideservice.config;
 
-import com.ridesharing.core.dto.ClientWhoDisconnectDto;
-import com.ridesharing.core.dto.DriverRequest;
-import com.ridesharing.core.dto.RideMatchRequest;
-import com.ridesharing.core.dto.RiderRideApprovedDto;
+import com.ridesharing.core.dto.*;
 import com.ridesharing.core.utils.Constants;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -106,13 +103,13 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, Object> clientDisconnectedConsumerFactory() {
+    public ConsumerFactory<String, ClientDisconnectDto> clientDisconnectedConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(clientDisconnectedConsumerConfig());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> clientDisconnectedListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, ClientDisconnectDto> clientDisconnectedListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, ClientDisconnectDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(clientDisconnectedConsumerFactory());
         return factory;
     }

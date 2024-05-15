@@ -112,4 +112,29 @@ public class kafkaConfig {
         factory.setConsumerFactory(clientWhoDisconnectedConsumerFactory());
         return factory;
     }
+
+
+    @Bean
+    public Map<String, Object> driverNotFoundConsumerConfig() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, StringDeserializer.class);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.DRIVER_NOT_FOUND_TOPIC_GROUP);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        return props;
+    }
+
+    @Bean
+    public ConsumerFactory<String, String> driverNotFoundConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(driverNotFoundConsumerConfig());
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String> driverNotFoundListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(driverNotFoundConsumerFactory());
+        return factory;
+    }
 }

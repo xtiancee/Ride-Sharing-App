@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@RedisHash(value="ride", timeToLive = 60L)
+//@RedisHash(value="ride", timeToLive = 60L)
+@RedisHash(value="ride")
 @Builder
 public class Ride implements Serializable {
 

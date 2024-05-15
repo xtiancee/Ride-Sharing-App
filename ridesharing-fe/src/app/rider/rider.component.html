@@ -36,6 +36,11 @@
                 </thead>
                 <tbody>
                 <tr><td>{{ currentLoc }}</td><td>{{ destLoc }}</td><th>$150</th><td>{{ driverName }}</td><td>{{ driverLoc }}</td></tr>
+                <tr *ngIf="driverNotFound">
+                  <td colspan="5" >
+                  <button class="btn btn-primary btn-sm" (click)="sendForRide()">Retry</button> &nbsp; &nbsp;
+                  <button class="btn btn-danger btn-sm" (click)="onCancelRideRequest()">Cancel</button></td>
+                </tr>
                 </tbody>
             </table>
         </div>

@@ -5,8 +5,8 @@ import com.ridesharing.core.dto.UserLocUpdateRequest;
 import com.ridesharing.core.dto.UserLocationDto;
 import com.ridesharing.core.model.ClientStatus;
 import com.ridesharing.core.model.UserType;
-import com.ridesharing.locationservice.repository.LocationRepository;
 import com.ridesharing.locationservice.model.UserLocation;
+import com.ridesharing.locationservice.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.Circle;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class LocationService {
 
     private final LocationRepository repository;
 
+
     public UserLocation saveLocation(UserLocUpdateRequest request) {
 
         Optional<UserLocation> userCurrentLoc = repository.findLocationById(request.getUserTypeId());
@@ -33,7 +35,8 @@ public class LocationService {
         if(userCurrentLoc.isPresent()){
             UserLocation dbLoc = userCurrentLoc.get();
             dbLoc.setCoordinates(new Point(request.getLng(), request.getLat()));
-            return repository.save(dbLoc);
+            var locSaved = repository.save(dbLoc);
+            return locSaved;
         }else{
             var location = UserLocation.builder()
                     .id(request.getUserTypeId())
@@ -44,7 +47,8 @@ public class LocationService {
                     .type(request.getUserType())
                     .coordinates(new Point(request.getLng(), request.getLat()))
                     .build();
-            return repository.save(location);
+            var locSaved =  repository.save(location);
+            return locSaved;
         }
     }
 
@@ -94,9 +98,14 @@ public class LocationService {
     }
 
     public List<UserLocation> getDriversForRider(Point location){
+
         Circle circle = new Circle(location,
                 new Distance(1, RedisGeoCommands.DistanceUnit.KILOMETERS));
-        return repository.findByTypeAndStatusAndCoordinatesWithin(UserType.DRIVER, ClientStatus.ONLINE, circle);
+
+         return repository.findByTypeAndStatusAndCoordinatesWithin(UserType.DRIVER, ClientStatus.ONLINE, circle)
+                 .stream()
+                 .filter(l -> !l.getType().equals(UserType.RIDER))
+                 .collect(Collectors.toList());
     }
 
     public UserLocationDto updateDriverLocAfterApproval(DriverLocUpdateRequest request) {
