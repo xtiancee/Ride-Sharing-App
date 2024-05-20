@@ -5,6 +5,8 @@ services:
     image: mongo:5.0
     ports:
       - "27018:27017"
+    volumes:
+      - ./data/db:/data/db
 
   redis:
     image: redis
