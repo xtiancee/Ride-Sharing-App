@@ -26,6 +26,9 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 @EnableWebSocketMessageBroker
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
@@ -52,10 +55,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("http://localhost:4200");
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:4200"); // Add your frontend URL here
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
+       // config.setAllowedOrigins(Arrays.asList("https://*", "http://*", "*", "http://localhost:4200"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"));
+        config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "OPTIONS"));
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
