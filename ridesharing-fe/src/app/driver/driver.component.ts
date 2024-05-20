@@ -50,6 +50,10 @@ export class DriverComponent implements OnInit, OnDestroy {
 
 ngOnInit() {
 
+  if(!navigator.geolocation) {
+    console.log("Geolocation not supported!")
+  }
+
     this.map = L.map('map').setView([4.863369, 6.999161], 13);
 
     this.locationUpdate();
@@ -131,8 +135,10 @@ ngOnInit() {
     this.intervalId = setInterval(() => {
 
       if(!navigator.geolocation){
+        console.log("Geolocation not supported!")
         return;
       }else{
+
         navigator.geolocation.getCurrentPosition((position) => {
 
           const coords = position.coords;

@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
-import { BehaviorSubject, catchError, tap, throwError } from "rxjs";
+import { BehaviorSubject, tap, throwError } from "rxjs";
 import { User } from "./user.model";
 import {UserService} from "../admin/user.service";
 
@@ -35,7 +35,7 @@ export class AuthService {
         const userDto = rp.user;
         const user = new User(userDto.id, userDto.firstName, userDto.lastName,
           userDto.email, userDto.type, rp.access_token, userDto.userTypeId);
-        localStorage.setItem('userData', JSON.stringify(user));
+        sessionStorage.setItem('userData', JSON.stringify(user));
         this.user.next(user)
       })
     )
@@ -53,7 +53,7 @@ export class AuthService {
             const userDto = rp.user;
             const user = new User(userDto.id, userDto.firstName, userDto.lastName,
               userDto.email, userDto.type, rp.access_token, userDto.user);
-            localStorage.setItem('userData', JSON.stringify(user));
+            sessionStorage.setItem('userData', JSON.stringify(user));
             this.user.next(user);
           }
         }));
@@ -81,11 +81,11 @@ export class AuthService {
   logout(){
     this.user.next(null);
     this.router.navigate(['/auth']);
-    localStorage.removeItem('userData');
+    sessionStorage.removeItem('userData');
   }
 
   autoLogin(){
-    const userData: {id: string, firstName:string, lastName:string, email:string, type:string, token:string, userTypeId:string} = JSON.parse(localStorage.getItem('userData'));
+    const userData: {id: string, firstName:string, lastName:string, email:string, type:string, token:string, userTypeId:string} = JSON.parse(sessionStorage.getItem('userData'));
     if(!userData)
       return;
 
@@ -137,6 +137,6 @@ export class AuthService {
     //const user = new User(email, userId, token, expirationDate)
    // this.user.next(user);
    // this.autoLogout(expiresIn * 1000);
-  //  localStorage.setItem('userData', JSON.stringify(user));
+  //  sessionStorage.setItem('userData', JSON.stringify(user));
   }
 }

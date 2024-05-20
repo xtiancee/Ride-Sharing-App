@@ -85,7 +85,6 @@ export class RiderComponent implements OnInit, OnDestroy {
       }
     });
 
-
     if(!navigator.geolocation)
       console.log("location is not supported");
 
