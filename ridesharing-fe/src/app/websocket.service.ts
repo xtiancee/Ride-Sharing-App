@@ -48,6 +48,14 @@ export class WebsocketService {
         this.stompClient.send("/app/location.update", {}, JSON.stringify(userLocation));
     }
 
+    startRide(dto: {rideId: string }){
+      this.stompClient.send("/app/ride.startRide", {}, JSON.stringify(dto));
+    }
+
+    endRide(dto: {rideId: string }){
+      this.stompClient.send("/app/ride.endRide", {}, JSON.stringify(dto));
+    }
+
     getDriverLocation(dto: any){
       this.stompClient.send("/app/ride.requestUserLocation", {}, JSON.stringify(dto));
     }

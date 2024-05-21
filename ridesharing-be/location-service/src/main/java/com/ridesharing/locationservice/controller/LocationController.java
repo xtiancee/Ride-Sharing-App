@@ -59,6 +59,12 @@ public class LocationController {
         return ResponseEntity.ok(locationService.updateDriverLocAfterApproval(request));
     }
 
+    @PostMapping(("/update-driver-online"))
+    public ResponseEntity<UserLocationDto> updateDriverOnline(@RequestBody DriverLocUpdateRequest request)
+    {
+        return ResponseEntity.ok(locationService.updateDriverOnline(request));
+    }
+
     @GetMapping("/user-location/{id}")
     public ResponseEntity<UserLocationDto> requestUserLoc(@PathVariable("id") String id)
     {

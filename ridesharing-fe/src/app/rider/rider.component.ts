@@ -16,6 +16,7 @@ export class RiderComponent implements OnInit, OnDestroy {
   textLabel = 'Please wait while we find you a close driver for your trip ...';
   rideLocIsSet = false;
   rideInProgress = false;
+  rideIsCancelled = null;
   currentLoc = null;
   destLoc = null;
   sub: Subscription;
@@ -31,6 +32,8 @@ export class RiderComponent implements OnInit, OnDestroy {
   driverMarker: any;
   ridePayload: any
   driverNotFound = false;
+  rideCompleted = undefined;
+  rideStarted = undefined;
 
   constructor(private webSocketService: WebsocketService,
               private authService: AuthService) {
@@ -50,6 +53,7 @@ export class RiderComponent implements OnInit, OnDestroy {
         this.webSocketService.riderSubscribe()
             .subscribe((message) => {
               message = JSON.parse(message)
+
               if(message.type === "DRIVER_APPROVED"){
                 this.driverName = message.message.driverName;
                 this.driverLoc = message.message.driverLng + "," + message.message.driverLat;
@@ -59,6 +63,8 @@ export class RiderComponent implements OnInit, OnDestroy {
 
                 this.getDriverLocation();
 
+                const driveLocation = [message.message.driverLat, message.message.driverLng]
+
                 this.driverMarker = L.marker([message.message.driverLat, message.message.driverLng])
                   .addTo(this.map);
                 this.driverMarker.bindPopup("Driver Location")
@@ -66,7 +72,7 @@ export class RiderComponent implements OnInit, OnDestroy {
                 var popup = L.popup();
 
                 popup
-                    .setLatLng(location)
+                    .setLatLng(driveLocation)
                     .setContent("Driver Location")
                     .openOn(this.map);
               }
@@ -74,14 +80,30 @@ export class RiderComponent implements OnInit, OnDestroy {
               if(message === "DRIVER_LOCATION"){
                 this.driverMarker.setLatLng([message.lng, message.lat]);
               }
+
               if(message.type === "DRIVER_NOT_FOUND"){
                 this.driverNotFound = true;
+              }
+
+              if(message.type === 'DRIVER_DISCONNECTED'){
+                this.rideIsCancelled = true;
+                this.driverNotFound = false;
+                this.rideLocIsSet = false;
+                this.rideInProgress = false;
+              }
+
+              if(message.type === 'RIDE_STARTED'){
+                this.textLabel = "Your driver has started your ride";
+              }
+
+              if(message.type === 'RIDE_COMPLETE'){
+                this.textLabel = "Your driver has ended your ride at destination";
+                this.rideCompleted = true;
               }
 
             });
       } else {
         console.log("on init stomp client is connected");
-        // Handle connection failure if needed
       }
     });
 
@@ -128,6 +150,12 @@ export class RiderComponent implements OnInit, OnDestroy {
         this.rideLocIsSet = true;
       })
     })
+  }
+
+  onCloseSuccessRide(){
+    this.rideInProgress = false;
+    this.rideStarted = false;
+    this.rideLocIsSet = false;
   }
 
   locationUpdate() {
@@ -217,9 +245,24 @@ export class RiderComponent implements OnInit, OnDestroy {
     }
   }
 
+  onCloseCancelledRide(){
+    if(this.driverLocInterval){
+      clearInterval(this.driverLocInterval);
+      clearInterval(this.intervalId)
+    }
+
+    this.rideLocIsSet = false;
+    this.rideIsCancelled = null;
+    this.driverMarker.unbindPopup();
+    this.driverMarker.closePopup();
+    this.map.removeLayer(this.driverMarker);
+  }
+
   onCancelRideRequest(){
     this.rideLocIsSet = false;
-    this.rideInProgress = false;
+    this.driverName = "Awaiting..";
+    this.driverLoc = "Awaiting";
+    this.driverApproved = false;
   }
 
   getDriverLocation(){

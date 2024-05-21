@@ -70,8 +70,6 @@ public class RideMatchingService {
                 var driverHasRequest = distributedLockService.driverRequestLock(drivers.get(0).getId());
 
                 if(driverHasRequest == null) {
-
-                    //private void notifyDriver(RideMatchRequest request, String driverId, String nextDriverId){
                     this.notifyDriver(request, drivers.get(0).getId(), nextDriverId);
                     return;
 
@@ -117,6 +115,8 @@ public class RideMatchingService {
 
     private void notifyDriver(RideMatchRequest request, String driverId, String nextDriverId){
 
+        log.info("Notifying driver with Ride Request Info {}", request.getRide());
+
         // Lock Driver and send him Request
         this.distributedLockService.lockDriver(driverId);
 
@@ -128,9 +128,10 @@ public class RideMatchingService {
                 .status(RideRequestStatus.PENDING)
                 .build();
 
-
         // save RideRequest
-        rideRestClient.saveRideRequest(driverRideRequestDto);
+         rideRestClient.saveRideRequest(driverRideRequestDto);
+
+        request.getRide().setId(request.getRide().getId());
         request.getRide().setDriverId(driverId);
 
         DriverRequest req = DriverRequest.builder()
@@ -142,6 +143,8 @@ public class RideMatchingService {
                 .withPayload(req)
                 .setHeader(KafkaHeaders.TOPIC, Constants.DRIVER_REQUEST_TOPIC)
                 .build();
+
+        log.info("Before sending driver request, ride is {} ", request.getRide());
 
         // Notify Driver
         kafkaTemplate.send(msg);

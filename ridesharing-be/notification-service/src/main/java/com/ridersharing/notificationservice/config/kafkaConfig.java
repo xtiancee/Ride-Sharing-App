@@ -2,6 +2,8 @@ package com.ridersharing.notificationservice.config;
 
 
 import com.ridesharing.core.dto.ClientDisconnectDto;
+import com.ridesharing.core.dto.ClientWhoDisconnectDto;
+import com.ridesharing.core.dto.RideActionDto;
 import com.ridesharing.core.utils.Constants;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -96,19 +98,19 @@ public class kafkaConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.RIDE_APPROVED_GROUP);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.CLIENT_WHO_DISCONNECTED_TOPIC_GROUP);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         return props;
     }
 
     @Bean
-    public ConsumerFactory<String, Object> clientWhoDisconnectedConsumerFactory() {
+    public ConsumerFactory<String, ClientWhoDisconnectDto> clientWhoDisconnectedConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(clientWhoDisconnectedConsumerConfig());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> clientWhoDisconnectedListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, ClientWhoDisconnectDto> clientWhoDisconnectedListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, ClientWhoDisconnectDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(clientWhoDisconnectedConsumerFactory());
         return factory;
     }
@@ -135,6 +137,31 @@ public class kafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String, String> driverNotFoundListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(driverNotFoundConsumerFactory());
+        return factory;
+    }
+
+
+    @Bean
+    public Map<String, Object> rideActionConsumerConfig() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, Constants.RIDE_ACTION_TOPIC_GROUP);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        return props;
+    }
+
+    @Bean
+    public ConsumerFactory<String, RideActionDto> rideActionConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(rideActionConsumerConfig());
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, RideActionDto> rideActionListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, RideActionDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(rideActionConsumerFactory());
         return factory;
     }
 }

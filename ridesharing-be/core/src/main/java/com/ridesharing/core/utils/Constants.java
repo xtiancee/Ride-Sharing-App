@@ -17,4 +17,7 @@ public class Constants {
 
     public static final String DRIVER_NOT_FOUND_TOPIC = "DriverNotFoundTopic";
     public static final String DRIVER_NOT_FOUND_TOPIC_GROUP = "groupDriverNotFound";
+
+    public static final String RIDE_ACTION_TOPIC = "RideActionTopic";
+    public static final String RIDE_ACTION_TOPIC_GROUP = "groupRideAction";
 }

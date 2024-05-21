@@ -7,14 +7,6 @@ import {RideRequest} from "./ride-request.model";
 
 declare const L: any;
 
-export interface RideRequestResponse {
-  rideId: string,
-  riderName: string,
-  fair: string,
-  source: string,
-  destination: string
-}
-
 @Component({
   selector: 'app-driver',
   templateUrl: './driver.component.html',
@@ -23,7 +15,6 @@ export interface RideRequestResponse {
 export class DriverComponent implements OnInit, OnDestroy {
 
   rideRequestIsSet = false;
-  rideLocIsSet = false;
   currentLoc = null;
   sub: Subscription;
   user: User = null;
@@ -38,6 +29,8 @@ export class DriverComponent implements OnInit, OnDestroy {
   riderMarker: any
   riderLat: any;
   riderLng: any;
+  rideIsCancelled = null;
+  rideStarted = false;
 
   constructor(private webSocketService: WebsocketService,
               private authService: AuthService) {
@@ -52,6 +45,7 @@ ngOnInit() {
 
   if(!navigator.geolocation) {
     console.log("Geolocation not supported!")
+    return;
   }
 
     this.map = L.map('map').setView([4.863369, 6.999161], 13);
@@ -80,21 +74,27 @@ ngOnInit() {
                   this.rideRequest = new RideRequest(reqBody.id, reqBody.riderName, reqBody.fare, reqBody.source, reqBody.destination);
                   this.rideRequestIsSet = true;
 
-                  this.riderMarker = L.marker([this.riderLat, this.riderLng]).addTo(this.map);
-
-                  this.riderMarker.bindPopup("My Location")
-
-                  var popup = L.popup();
-
-                 popup
-                  .setLatLng(location)
-                  .setContent("Rider Location ")
-                  .openOn(this.map);
               }
 
-              if(message === "DRIVER_LOCATION"){
+              if(message === "RIDER_LOCATION"){
                 this.riderMarker.setLatLng([message.lng, message.lat]);
               }
+
+              if(message.type === 'CLIENT_DISCONNECTED'){
+                this.rideRequestIsSet = false;
+                this.rideIsCancelled = true;
+              }
+
+              if(message.type === 'RIDE_STARTED'){
+                this.h5TextLabel = "Your just started your ride";
+              }
+
+              if(message.type === 'RIDE_COMPLETE'){
+                this.h5TextLabel = "Your have gotten to destination and completed Ride";
+                this.rideRequestIsSet = false;
+                this.rideRequest = null;
+              }
+
             });
       } else {
         console.log("on init stomp client is connected");
@@ -128,6 +128,28 @@ ngOnInit() {
           .setContent("My Location ")
           .openOn(this.map);
     });
+  }
+
+  onCloseCancelledRide(){
+    this.rideIsCancelled = null;
+    if(this.riderLocInterval){
+      clearInterval(this.riderLocInterval);
+    }
+
+    this.riderMarker.closePopup();
+    this.riderMarker.unbindPopup();
+    this.map.removeLayer(this.riderMarker);
+  }
+
+  onStartRide() {
+   // this.rideRequestAccepted = tr;
+    this.rideStarted = true;
+    this.webSocketService.startRide({rideId: this.rideRequest.id });
+  }
+
+  onEndRide() {
+    this.rideStarted = true;
+    this.webSocketService.endRide({rideId: this.rideRequest.id });
   }
 
   locationUpdate() {
@@ -171,6 +193,8 @@ ngOnInit() {
 
     if(!status){
       this.rideRequestIsSet = false;
+      this.riderLat = null;
+      this.riderLng = null;
     }
 
     const approvalDto = {
@@ -181,17 +205,26 @@ ngOnInit() {
       approved: status
     }
 
-    console.log("Data for approval ", approvalDto);
-
     this.webSocketService.rideApproval(approvalDto);
 
     if(status) {
       this.h5TextLabel = "Proceed to Rider Location and click the start Ride Button after you get to location"
       this.rideRequestAccepted = true;
       this.getRiderLocation();
+
+      const riderLocation = [this.riderLat, this.riderLng];
+
+     this.riderMarker = L.marker(riderLocation).addTo(this.map);
+     this.riderMarker.bindPopup("Rider Location")
+
+     var popup = L.popup();
+
+      popup
+       .setLatLng(riderLocation)
+       .setContent("Rider Location ")
+       .openOn(this.map);
     }
   }
-
 
   getRiderLocation(){
 

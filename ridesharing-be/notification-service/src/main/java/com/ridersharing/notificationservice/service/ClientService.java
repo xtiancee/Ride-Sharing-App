@@ -62,4 +62,14 @@ public class ClientService {
         log.info("User Location Retrieved {} ", location);
         messageTemplate.convertAndSendToUser(request.getFrom(), destination, msg);
     }
+
+    public void startRide(RideActionRequestDto req){
+        log.info("Start Ride called with {} ", req);
+        this.rideClient.startRide(req);
+    }
+
+    public void endRide(RideActionRequestDto req){
+        log.info("End Ride called with {} ", req);
+        this.rideClient.endRide(req);
+    }
 }

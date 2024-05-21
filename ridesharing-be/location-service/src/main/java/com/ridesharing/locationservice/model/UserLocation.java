@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.GeoIndexed;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 
@@ -24,7 +25,11 @@ public class UserLocation implements Serializable {
     private String firstName;
     private String lastName;
     private String userId;
+
+    @Indexed
     private UserType type;
+
+    @Indexed
     private ClientStatus status;
 
     @GeoIndexed

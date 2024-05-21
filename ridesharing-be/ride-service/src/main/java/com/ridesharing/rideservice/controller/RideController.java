@@ -1,9 +1,10 @@
 package com.ridesharing.rideservice.controller;
 
+import com.ridesharing.core.dto.NewRideRequest;
+import com.ridesharing.core.dto.RideActionRequestDto;
+import com.ridesharing.core.dto.RideDto;
 import com.ridesharing.core.dto.RideRequestApprovalDto;
 import com.ridesharing.rideservice.dto.DriverRideRequestDto;
-import com.ridesharing.core.dto.NewRideRequest;
-import com.ridesharing.core.dto.RideDto;
 import com.ridesharing.rideservice.model.Ride;
 import com.ridesharing.rideservice.model.RideRequest;
 import com.ridesharing.rideservice.service.RideService;
@@ -38,6 +39,31 @@ public class RideController {
     public ResponseEntity<Void> processRequestApproval(@RequestBody RideRequestApprovalDto request)
     {
         rideService.processApproval(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/start-ride")
+    public ResponseEntity<Void> startRide(@RequestBody RideActionRequestDto request){
+        this.rideService.startRide(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/end-ride")
+    public ResponseEntity<Void> endRide(@RequestBody RideActionRequestDto request){
+        this.rideService.endRide(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Iterable<Ride>> getRides()
+    {
+        return ResponseEntity.ok(this.rideService.findAll());
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteRides()
+    {
+        this.rideService.deleteAll();
         return ResponseEntity.ok().build();
     }
 }

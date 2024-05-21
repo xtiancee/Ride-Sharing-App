@@ -1,10 +1,8 @@
 package com.ridersharing.notificationservice.service;
 
-import com.ridesharing.core.dto.ClientWhoDisconnectDto;
-import com.ridesharing.core.dto.DriverRequest;
-import com.ridesharing.core.dto.NotificationMsg;
-import com.ridesharing.core.dto.RiderRideApprovedDto;
+import com.ridesharing.core.dto.*;
 import com.ridesharing.core.model.NotificationType;
+import com.ridesharing.core.model.RideActionType;
 import com.ridesharing.core.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +55,8 @@ public class NotificationService {
             containerFactory = "clientWhoDisconnectedListenerContainerFactory")
     public void listenForClientWhoDisconnected(ClientWhoDisconnectDto msg){
 
+        log.info("Listened to client who disconnected with message {} ", msg);
+
         NotificationType notificationType;
         String whoDisconnected = "";
 
@@ -90,5 +90,37 @@ public class NotificationService {
                 .build();
 
         messageTemplate.convertAndSendToUser(msg, "/rider", message);
+    }
+
+    @KafkaListener(
+            topics = Constants.RIDE_ACTION_TOPIC,
+            groupId = Constants.RIDE_ACTION_TOPIC_GROUP,
+            containerFactory = "rideActionListenerContainerFactory")
+    public void listenForRideAction(RideActionDto msg){
+
+        NotificationType type = null;
+
+        log.info("listenForRideAction with request: {} ", msg);
+
+        if(msg.getType().equals(RideActionType.STARTED)){
+            type = NotificationType.RIDE_STARTED;
+        }else{
+            type = NotificationType.RIDE_COMPLETE;
+        }
+
+        // notify rider for ride approved
+        NotificationMsg messageRider = NotificationMsg.builder()
+                .type(type)
+                .message("Ride " + msg.getType().name())
+                .build();
+
+        messageTemplate.convertAndSendToUser(msg.getRide().getRiderId(), "/rider", messageRider);
+
+        NotificationMsg messageDriver = NotificationMsg.builder()
+                .type(type)
+                .message("Ride " + msg.getType().name())
+                .build();
+
+        messageTemplate.convertAndSendToUser(msg.getRide().getDriverId(), "/driver", messageDriver);
     }
 }

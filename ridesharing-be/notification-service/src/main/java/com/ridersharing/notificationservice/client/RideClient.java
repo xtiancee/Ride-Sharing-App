@@ -1,6 +1,7 @@
 package com.ridersharing.notificationservice.client;
 
 import com.ridesharing.core.dto.NewRideRequest;
+import com.ridesharing.core.dto.RideActionRequestDto;
 import com.ridesharing.core.dto.RideDto;
 import com.ridesharing.core.dto.RideRequestApprovalDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -15,4 +16,10 @@ public interface RideClient {
 
     @PostMapping("/api/v1/ride/request-approval")
     void processRequestApproval(@RequestBody RideRequestApprovalDto request);
+
+    @PostMapping("/api/v1/ride/start-ride")
+    void startRide(@RequestBody RideActionRequestDto request);
+
+    @PostMapping("/api/v1/ride/end-ride")
+    void endRide(@RequestBody RideActionRequestDto request);
 }

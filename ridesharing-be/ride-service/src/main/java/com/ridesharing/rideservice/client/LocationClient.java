@@ -12,6 +12,9 @@ public interface LocationClient {
     @PostMapping("/api/v1/location/update-driver")
     ResponseEntity<UserLocationDto> updateDriverLocAfterApproval(@RequestBody DriverLocUpdateRequest request);
 
+    @PostMapping("/api/v1/location/update-driver-online")
+    ResponseEntity<UserLocationDto> updateDriverOnline(@RequestBody DriverLocUpdateRequest request);
+
     @GetMapping("/api/v1/location/driver/{id}")
     UserLocationDto findDriverById(@PathVariable("id") String id);
 

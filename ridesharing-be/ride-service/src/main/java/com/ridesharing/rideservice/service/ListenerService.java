@@ -30,7 +30,7 @@ public class ListenerService {
     private final UserClient userClient;
     private final RideRepository repository;
 
-    private KafkaTemplate<String, ClientWhoDisconnectDto> clientWhoDisconnectKafkaTemplate;
+    private final KafkaTemplate<String, ClientWhoDisconnectDto> clientWhoDisconnectKafkaTemplate;
 
     @KafkaListener(topics = Constants.CLIENT_DISCONNECTS_TOPIC, containerFactory = "clientDisconnectedListenerContainerFactory")
     public void listenToClientDisconnect(ClientDisconnectDto request) {
@@ -83,6 +83,8 @@ public class ListenerService {
                         .withPayload(newClientWhoDisconnectReq)
                         .setHeader(KafkaHeaders.TOPIC, Constants.CLIENT_WHO_DISCONNECTED_TOPIC)
                         .build();
+
+                log.info("Kafka message sent for client who disconnected!");
 
                 clientWhoDisconnectKafkaTemplate.send(msg);
             }

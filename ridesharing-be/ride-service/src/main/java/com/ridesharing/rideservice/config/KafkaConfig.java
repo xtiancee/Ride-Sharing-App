@@ -31,6 +31,20 @@ public class KafkaConfig {
     }
 
     @Bean
+    public DefaultKafkaProducerFactory<String, RideActionDto> rideActionProducerFactory(){
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
+    public KafkaTemplate<String, RideActionDto> rideActionkafkaTemplate() {
+        return new KafkaTemplate<>(rideActionProducerFactory());
+    }
+
+    @Bean
     public DefaultKafkaProducerFactory<String, RideMatchRequest> rideMatchRequestProducerFactory(){
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");

@@ -106,6 +106,7 @@ public class LocationService {
                  .stream()
                  .filter(l -> !l.getType().equals(UserType.RIDER))
                  .collect(Collectors.toList());
+
     }
 
     public UserLocationDto updateDriverLocAfterApproval(DriverLocUpdateRequest request) {
@@ -114,13 +115,36 @@ public class LocationService {
 
         if(userCurrentLoc.isPresent()){
 
-            log.info("updateDriverLocation before update: {} ", userCurrentLoc.get());
             UserLocation dbLoc = userCurrentLoc.get();
             dbLoc.setStatus(ClientStatus.IN_RIDE);
             repository.save(dbLoc);
-            log.info("updateDriverLocation after update: {} ", dbLoc);
 
             log.info("");
+
+            return UserLocationDto.builder()
+                    .id(dbLoc.getId())
+                    .firstName(dbLoc.getFirstName())
+                    .lastName(dbLoc.getLastName())
+                    .userId(dbLoc.getUserId())
+                    .type(dbLoc.getType())
+                    .status(dbLoc.getStatus())
+                    .lat(dbLoc.getCoordinates().getY())
+                    .lng(dbLoc.getCoordinates().getX())
+                    .build();
+        }
+
+        return null;
+    }
+
+    public UserLocationDto updateDriverOnline(DriverLocUpdateRequest request) {
+
+        Optional<UserLocation> userCurrentLoc = repository.findLocationById(request.getDriverId());
+
+        if(userCurrentLoc.isPresent()){
+
+            UserLocation dbLoc = userCurrentLoc.get();
+            dbLoc.setStatus(ClientStatus.ONLINE);
+            repository.save(dbLoc);
 
             return UserLocationDto.builder()
                     .id(dbLoc.getId())

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-@RedisHash(value="ride", timeToLive = 60L)
+@RedisHash(value="driver_lock", timeToLive = 60L)
 @Builder
 public class DriverRequestLock implements Serializable {
 

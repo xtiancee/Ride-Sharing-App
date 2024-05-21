@@ -38,7 +38,7 @@ public class WebSocketEventListener {
                .setHeader(KafkaHeaders.TOPIC, Constants.CLIENT_DISCONNECTS_TOPIC)
                .build();
 
-       System.out.println("Notifying Rider Service ");
+            System.out.println("Notifying Rider Service ");
 
              kafkaTemplate.send(msg);
         }

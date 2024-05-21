@@ -1,10 +1,7 @@
 package com.ridersharing.notificationservice.controller;
 
 import com.ridersharing.notificationservice.service.ClientService;
-import com.ridesharing.core.dto.NewRideRequest;
-import com.ridesharing.core.dto.RequestUserLocDto;
-import com.ridesharing.core.dto.RideRequestApprovalDto;
-import com.ridesharing.core.dto.UserLocUpdateRequest;
+import com.ridesharing.core.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Controller;
 public class NotificationController {
 
     private final ClientService clientService;
-  //  private final SimpMessageSendingOperations messageTemplate;
 
     @MessageMapping("/location.update")
     public void updateLocation(@Payload UserLocUpdateRequest request) {
@@ -40,6 +36,18 @@ public class NotificationController {
     public void requestUserLocation(@Payload RequestUserLocDto request) {
         log.info("Received, requestUserLocation {} ", request);
         clientService.requestUserLocation(request);
+    }
+
+    @MessageMapping("/ride.startRide")
+    public void startRide(@Payload RideActionRequestDto request) {
+        log.info("Received, startRide Request {} ", request);
+        clientService.startRide(request);
+    }
+
+    @MessageMapping("/ride.endRide")
+    public void endRide(@Payload RideActionRequestDto request) {
+        log.info("Received, endRide Request {} ", request);
+        clientService.endRide(request);
     }
 }
 

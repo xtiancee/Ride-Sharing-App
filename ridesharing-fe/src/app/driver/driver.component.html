@@ -21,10 +21,25 @@
                 <button class="btn btn-danger btn-sm" (click)="onRequestApproval(false)">Reject</button></td>
             </tr>
             <tr *ngIf="rideRequestAccepted"><td colspan="3" >
-              <button class="btn btn-success btn-sm" (click)="onRequestApproval(true)">Start Ride</button> &nbsp; &nbsp;
-              <button class="btn btn-danger btn-sm" (click)="onRequestApproval(false)">Cancel Ride</button></td>
+              <button class="btn btn-success btn-sm" (click)="onStartRide()" *ngIf="!rideStarted">Start Ride</button> &nbsp; &nbsp;
+              <button class="btn btn-danger btn-sm" (click)="onEndRide()" *ngIf="rideStarted">End Ride</button></td>
             </tr>
             </tbody>
         </table>
     </div>
+
+  <div *ngIf="rideIsCancelled">
+    <div style="text-align: center; color: orangered; font-size: 16px"><h5>Oops! Your rider disconnected and your ride cancelled!</h5></div>
+    <table class="table table-striped">
+      <thead>
+      <tr><th>Rider Name</th><th>Source</th><th>Destination</th><th>Price</th></tr>
+      </thead>
+      <tbody>
+      <tr><td>{{ rideRequest.riderName }}</td><td>{{ rideRequest.source }}</td><td>{{ rideRequest.destination }}</td><td>{{ rideRequest.fair }}</td></tr>
+      <tr><td colspan="3" >
+        <button class="btn btn-danger btn-sm" (click)="onCloseCancelledRide()">Close</button></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

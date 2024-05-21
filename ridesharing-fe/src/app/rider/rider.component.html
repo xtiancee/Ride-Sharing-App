@@ -41,11 +41,32 @@
                   <button class="btn btn-primary btn-sm" (click)="sendForRide()">Retry</button> &nbsp; &nbsp;
                   <button class="btn btn-danger btn-sm" (click)="onCancelRideRequest()">Cancel</button></td>
                 </tr>
+                <tr *ngIf="rideCompleted">
+                  <td colspan="5" >
+                    <button class="btn btn-danger btn-sm" (click)="onCloseSuccessRide()">Close</button></td>
+                </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div >
 
+  <div *ngIf="rideIsCancelled" style="text-align: center;">
+
+    <h6 style=" color: orangered; font-size: 16px; margin-bottom: 5px" class="pending">Oops! Your driver disconnected and your ride cancelled!</h6>
+
+    <div>
+      <table class="table table-striped">
+        <thead>
+        <tr><th>Your Location</th><th>Destination</th><th>Price</th><th>Driver Name</th><th>Driver Location</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>{{ currentLoc }}</td><td>{{ destLoc }}</td><th>$150</th><td>{{ driverName }}</td><td>{{ driverLoc }}</td></tr>
+        <tr>
+          <td colspan="5" >
+            <button class="btn btn-danger btn-sm" (click)="onCloseCancelledRide()">Close</button></td>
+        </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>

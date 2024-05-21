@@ -2,6 +2,7 @@ package com.ridesharing.rideservice.service;
 
 import com.ridesharing.core.dto.*;
 import com.ridesharing.core.model.ClientStatus;
+import com.ridesharing.core.model.RideActionType;
 import com.ridesharing.core.model.RideRequestStatus;
 import com.ridesharing.core.model.RideStatus;
 import com.ridesharing.core.utils.Constants;
@@ -30,12 +31,12 @@ import java.util.Optional;
 @Slf4j
 public class RideService {
 
-
     private final RideRepository rideRepository;
     private final RideRequestRepository rideRequestRepository;
     private final KafkaTemplate<String, RiderRideApprovedDto> kafkaTemplateRideApproved;
     private final KafkaTemplate<String, com.ridesharing.core.dto.RideMatchRequest> kafkaTemplateRideMatch;
     private final KafkaTemplate<String, DriverRequest> kafkaTemplateDriverRequest;
+    private final KafkaTemplate<String, RideActionDto> kafkaTemplateRideAction;
     private final LocationClient locationRestClient;
     private final RideMatchingClient rideMatchingRestClient;
 
@@ -63,8 +64,6 @@ public class RideService {
 
         log.info("Saving Ride and sending topic");
 
-        log.info("Saved Ride is {} ", ride);
-
         // publish to matching service
         sendMatchRequest(kafkaTemplateRideMatch, ride);
 
@@ -86,6 +85,7 @@ public class RideService {
 
     public RideRequest saveDriverRideRequest(DriverRideRequestDto request){
 
+        log.info("getting Ride Request with ID: {} ", request.getRideId());
         Optional<RideRequest> rideReq = rideRequestRepository.findById(request.getRideId());
         RideRequest req = null;
 
@@ -253,5 +253,67 @@ public class RideService {
                 .build();
 
         kafkaTemplate.send(msg);
+    }
+
+    public void startRide(RideActionRequestDto request){
+
+        log.info("starting Ride with request {} ", request);
+
+        Ride ride = findById(request.getRideId());
+        ride.setStatus(RideStatus.STARTED);
+        this.rideRepository.save(ride);
+
+        // NOTIFY CLIENTS RIDE STARTED
+
+        var newRideAction = RideActionDto.builder()
+                .ride(Utility.ConvertRideToDto(ride))
+                .type(RideActionType.STARTED)
+                .build();
+
+        Message<RideActionDto> msg = MessageBuilder
+                .withPayload(newRideAction)
+                .setHeader(KafkaHeaders.TOPIC, Constants.RIDE_ACTION_TOPIC)
+                .build();
+
+        kafkaTemplateRideAction.send(msg);
+    }
+
+    public void endRide(RideActionRequestDto request){
+
+        log.info("ending Ride with request {} ", request);
+
+        Ride ride = findById(request.getRideId());
+        ride.setStatus(RideStatus.COMPLETE);
+        this.rideRepository.save(ride);
+
+        // MARK DRIVER LOCATION ONLINE AGAIN
+
+        this.locationRestClient.updateDriverOnline(DriverLocUpdateRequest.builder()
+                        .status(ClientStatus.ONLINE)
+                .driverId(ride.getDriverId())
+                .build());
+
+
+        // NOTIFY CLIENTS RIDE ENDED.
+
+        var newRideAction = RideActionDto.builder()
+                .ride(Utility.ConvertRideToDto(ride))
+                .type(RideActionType.ENDED)
+                .build();
+
+        Message<RideActionDto> msg = MessageBuilder
+                .withPayload(newRideAction)
+                .setHeader(KafkaHeaders.TOPIC, Constants.RIDE_ACTION_TOPIC)
+                .build();
+
+        kafkaTemplateRideAction.send(msg);
+    }
+
+    public Iterable<Ride> findAll(){
+        return this.rideRepository.findAll();
+    }
+
+    public void deleteAll() {
+        this.rideRepository.deleteAll();;
     }
 }
