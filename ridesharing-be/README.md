@@ -3,17 +3,15 @@
 Architecture: Microservice
 
 ## Prerequisites
-
 1. Java 17
 2. Kafka
 3. Mongo Db
 4. Redis
 
 ## Project Setup
-
-
-1. cd into project folder
-2. Run `mvn clean install`
+1. Install Java 17 in your machine.
+2. cd into project folder
+3. Run `mvn clean install`
 
 ## Run Project 
 1. cd into project folder
@@ -24,14 +22,4 @@ Architecture: Microservice
 6. java -jar notification-service/target/notification-service-1.0-SNAPSHOT.jar
 7. java -jar location-service/target/location-service-1.0-SNAPSHOT.jar
 8. java -jar apigw/target/apigw-1.0-SNAPSHOT.jar
-
-Notes: 
-1. The steps should be followed as listed
-2. After a successful startup. sign in through front end with details below
-
-email: `admin@email.com`
-password: `123456`
-
-3. Use the "Signup" tab at the front end to signup "Riders only", when logged in as Admin user. You will find option to onboard drivers at the driver tab
-
-Thats all.
+9. Proceed to front end README setup after applications are up.
