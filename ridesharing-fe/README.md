@@ -5,7 +5,7 @@
 2. node v18+
 
 ## Project Setup
-1. Install Node 18+ using NVM (node package manager)
+1. Install Node 18+ using NVM (node version manager)
 2. Install Angular CLI using `npm install -g @angular/cli@17`
 3. cd into project folder
 4. Run `npm install`
