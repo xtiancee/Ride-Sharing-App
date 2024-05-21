@@ -6,7 +6,9 @@
 ## Application Setup Process
 
 STEP 1: run `docker compose up` on the project root folder to start up MongoDB, Redis and Kafka and allow the process to complete to call up the necessary services.
-STEP 2: Find the README.md file in ridesharing-be for setup steps and running the backend application.
+
+STEP 2: Find the README.md file in ridesharing-be for setup steps and running the backend application. 
+
 STEP 3: Find the README.md files in ridesharing-fe for setup steps and running the front end application
 
 ### NOTE:
